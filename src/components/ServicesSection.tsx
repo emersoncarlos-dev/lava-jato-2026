@@ -9,7 +9,7 @@ const categories = [
       {
         title: "Lavagem Simples",
         description: "Lavagem externa completa com produtos de qualidade. Sua moto brilhando como nova.",
-        price: "A partir de R$ 25",
+        price: "A partir de R$ 20",
       },
       {
         title: "Lavagem Completa",
@@ -25,7 +25,7 @@ const categories = [
       {
         title: "Lavagem Simples",
         description: "Lavagem externa com shampoo automotivo premium. Seu carro limpo e brilhante.",
-        price: "A partir de R$ 35",
+        price: "A partir de R$ 40",
       },
       {
         title: "Lavagem Completa",
