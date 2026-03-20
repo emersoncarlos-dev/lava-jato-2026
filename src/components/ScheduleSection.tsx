@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CalendarIcon, Clock, ArrowRight } from "lucide-react";
+import { CalendarIcon, Clock, ArrowRight, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner"; // 👈 importação da função toast
 
 const timeSlots = [
   "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
@@ -23,9 +24,12 @@ const WHATSAPP_NUMBER = "5581993784501";
 const ScheduleSection = () => {
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>();
+  const [isSending, setIsSending] = useState(false);
 
   const handleSchedule = () => {
     if (!date || !time) return;
+
+    setIsSending(true);
 
     const formattedDate = format(date, "dd/MM/yyyy", { locale: ptBR });
     const dayName = format(date, "EEEE", { locale: ptBR });
@@ -33,15 +37,28 @@ const ScheduleSection = () => {
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, "_blank");
 
+    // ✅ Notificação de sucesso
+    toast.success("Solicitação enviada! ✅ Em breve verificaremos a disponibilidade do horário.", {
+      duration: 5000,
+      position: "bottom-center",
+    });
+
     // Limpar os campos após abrir o WhatsApp
-    setDate(undefined);
-    setTime(undefined);
+    setTimeout(() => {
+      setDate(undefined);
+      setTime(undefined);
+      setIsSending(false);
+    }, 500);
   };
 
   const isDateDisabled = (d: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return d < today || d.getDay() === 0;
+  };
+
+  const formatFullDate = (date: Date) => {
+    return format(date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   };
 
   return (
@@ -93,7 +110,7 @@ const ScheduleSection = () => {
                   >
                     <CalendarIcon className="mr-3 h-4 w-4 text-primary" />
                     {date
-                      ? format(date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+                      ? formatFullDate(date)
                       : "Selecione uma data"}
                   </Button>
                 </PopoverTrigger>
@@ -107,9 +124,7 @@ const ScheduleSection = () => {
                     initialFocus
                     className="p-3 pointer-events-auto"
                     classNames={{
-                      // Destacar o dia de hoje de forma sutil: apenas borda e negrito
                       day_today: "text-primary font-bold border border-primary/30",
-                      // Dia selecionado com fundo vermelho forte
                       day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
                     }}
                   />
@@ -147,35 +162,59 @@ const ScheduleSection = () => {
               </div>
             </div>
 
-            {/* Step 3: Confirm */}
+            {/* Step 3: Preview & Confirm */}
             <div className="pt-4 border-t border-border">
               {date && time && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="font-body text-sm text-muted-foreground mb-4 text-center"
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-primary/5 border border-primary/20 rounded-md p-5 mb-6"
                 >
-                  Agendamento para{" "}
-                  <span className="text-foreground font-medium">
-                    {format(date, "dd/MM/yyyy", { locale: ptBR })}
-                  </span>{" "}
-                  às{" "}
-                  <span className="text-foreground font-medium">{time}</span>
-                </motion.p>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="text-primary w-5 h-5 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground mb-2">
+                        Resumo do agendamento:
+                      </p>
+                      <div className="space-y-1 text-sm text-muted-foreground">
+                        <p className="flex items-center gap-2">
+                          <CalendarIcon className="w-4 h-4 text-primary" />
+                          <span>{formatFullDate(date)}</span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-primary" />
+                          <span>Horário: {time}</span>
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-3 italic">
+                        Clique no botão abaixo para confirmar e enviar via WhatsApp.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
               )}
 
               <button
                 onClick={handleSchedule}
-                disabled={!date || !time}
+                disabled={!date || !time || isSending}
                 className={cn(
                   "w-full flex items-center justify-center gap-3 py-4 rounded-sm font-body font-bold uppercase tracking-widest text-sm transition-all duration-200",
-                  date && time
+                  date && time && !isSending
                     ? "bg-primary text-primary-foreground hover:opacity-90 shadow-red-glow cursor-pointer"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
                 )}
               >
-                Confirmar pelo WhatsApp
-                <ArrowRight className="w-4 h-4" />
+                {isSending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    Confirmar pelo WhatsApp
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </div>
           </div>
