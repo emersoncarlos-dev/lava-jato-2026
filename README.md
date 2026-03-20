@@ -1,8 +1,8 @@
 #  Preto Jato – Estética Automotiva
 
-![Preview do site](./public/preview.png) <!-- Substitua pelo caminho de uma imagem real se desejar -->
+![Preview do site](./assets/lava-jato.jpg)
 
-Site institucional da **Preto Jato**, uma empresa especializada em estética automotiva de alta qualidade. Desenvolvido com **React**, **TypeScript**, **Tailwind CSS** e **Framer Motion**, o site apresenta os serviços da empresa, galeria de antes/depois, informações de contato e um sistema de agendamento via WhatsApp.
+O Preto Jato é um site institucional moderno desenvolvido para uma empresa de estética automotiva de alto padrão. O projeto foca em conversão, permitindo que o cliente visualize serviços, resultados (antes e depois) e realize o agendamento de horários diretamente via WhatsApp.
 
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
